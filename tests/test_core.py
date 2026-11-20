@@ -1,7 +1,16 @@
 """Tests for Medical Terminology Helper milestones."""
 import pytest
 
-from app.core import corpus_stats, get_corpus_text, load_medical_corpus, milestone_1, search_corpus
+from app.core import (
+    BytePairTokenizer,
+    MedicalEmbedding,
+    corpus_stats,
+    get_corpus_text,
+    load_medical_corpus,
+    milestone_1,
+    milestone_2,
+    search_corpus,
+)
 
 
 # Milestone 1: Curate a small corpus of public domain medical texts (e.g., anatomy, physiology).
@@ -20,9 +29,27 @@ def test_milestone_1():
 
 
 # Milestone 2: Implement the byte-pair tokenizer and generate embeddings from the medical corpus.
-@pytest.mark.skip(reason="remove this line when you start milestone 2")
 def test_milestone_2():
-    raise NotImplementedError("write the test for milestone 2")
+    result = milestone_2(vocab_size=360, d_model=32, max_seq_len=64)
+    tokenizer = result["tokenizer"]
+    embeddings = result["sample_embeddings"]
+
+    assert isinstance(tokenizer, BytePairTokenizer)
+    assert tokenizer.vocab_size > 260
+    assert tokenizer.vocab_size <= 360
+
+    phrase = "Bradycardia is an abnormally slow resting heart rate."
+    ids = tokenizer.encode(phrase)
+    assert len(ids) < len(phrase.encode("utf-8"))  # BPE compresses medical text
+    assert tokenizer.decode(ids) == phrase
+
+    # Serialization round-trip
+    restored = BytePairTokenizer.from_dict(tokenizer.to_dict())
+    assert restored.encode(phrase) == ids
+    assert restored.decode(ids) == phrase
+
+    # Embedding shape check: (batch=1, seq_len, d_model=32)
+    assert embeddings.shape == (1, len(result["sample_token_ids"]), 32)
 
 
 # Milestone 3: Build the causal self-attention mechanism and assemble the transformer block.
