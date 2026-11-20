@@ -14,6 +14,7 @@ from collections import Counter
 from dataclasses import asdict, dataclass
 import math
 from pathlib import Path
+import random
 import re
 import time
 from typing import Callable
@@ -884,7 +885,68 @@ def milestone_5(
     )
 
 
-# --- Milestone 6: Create a CLI for students to enter partial phrases and get completions.
-# Hint: Command-Line Interface (CLI) development.
-def milestone_6():  # TODO(milestone 6)
-    raise NotImplementedError("TODO(milestone 6)")
+# ============================================================================
+# Milestone 6: CLI & Study Helper Utilities
+# ============================================================================
+
+def build_quiz_question(
+    entries: list[dict[str, str]] | None = None,
+    seed: int | None = None,
+) -> dict[str, str]:
+    """Build a fill-in-the-blank medical terminology question from the corpus."""
+    pool = entries if entries is not None else load_medical_corpus()
+    rng = random.Random(seed)
+    eligible = [e for e in pool if len(e["text"].split()) >= 6 and " is " in e["text"]]
+    entry = rng.choice(eligible or pool)
+    parts = entry["text"].split(" is ", 1)
+    if len(parts) == 2:
+        prompt = f"{parts[0]} is "
+        answer = parts[1]
+    else:
+        words = entry["text"].split()
+        split_at = max(1, len(words) // 3)
+        prompt = " ".join(words[:split_at]) + " "
+        answer = " ".join(words[split_at:])
+    return {
+        "term": entry["term"],
+        "category": entry["category"],
+        "prompt": prompt,
+        "reference_completion": answer,
+        "full_text": entry["text"],
+    }
+
+
+def milestone_6(
+    prompt: str = "Alveoli are ",
+    checkpoint_path: str | Path | None = None,
+    max_new_tokens: int = 24,
+    temperature: float = 0.0,
+) -> dict:
+    """Milestone 6: End-to-end helper powering the CLI completion command."""
+    if checkpoint_path is not None and Path(checkpoint_path).exists():
+        model, tokenizer, _ = load_checkpoint(checkpoint_path)
+    else:
+        cfg = TrainingConfig(
+            vocab_size=360,
+            d_model=64,
+            n_heads=4,
+            n_layers=2,
+            max_seq_len=64,
+            batch_size=16,
+            epochs=8,
+            learning_rate=5e-3,
+            stride=20,
+            device="cpu",
+        )
+        trained = train_model(config=cfg, checkpoint_path=checkpoint_path)
+        model, tokenizer = trained["model"], trained["tokenizer"]
+
+    result = generate_completion(
+        model=model,
+        tokenizer=tokenizer,
+        prompt=prompt,
+        max_new_tokens=max_new_tokens,
+        temperature=temperature,
+    )
+    result["related_entries"] = search_corpus(prompt.split()[0], limit=3) if prompt.strip() else []
+    return result

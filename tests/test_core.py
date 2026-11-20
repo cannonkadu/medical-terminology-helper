@@ -2,6 +2,7 @@
 import pytest
 import torch
 
+from app.cli import main as cli_main
 from app.core import (
     BytePairTokenizer,
     CausalSelfAttention,
@@ -20,6 +21,7 @@ from app.core import (
     milestone_3,
     milestone_4,
     milestone_5,
+    milestone_6,
     search_corpus,
 )
 
@@ -127,6 +129,57 @@ def test_milestone_5():
 
 
 # Milestone 6: Create a CLI for students to enter partial phrases and get completions.
-@pytest.mark.skip(reason="remove this line when you start milestone 6")
-def test_milestone_6():
-    raise NotImplementedError("write the test for milestone 6")
+def test_milestone_6(tmp_path, capsys, monkeypatch):
+    ckpt = tmp_path / "cli_medical_gpt.pt"
+    monkeypatch.setenv("DATA_PATH", str(tmp_path / "app.json"))
+
+    # 1. Train via CLI
+    cli_main([
+        "train",
+        "--epochs", "4",
+        "--vocab-size", "320",
+        "--d-model", "48",
+        "--n-heads", "4",
+        "--n-layers", "2",
+        "--max-seq-len", "48",
+        "--stride", "24",
+        "--device", "cpu",
+        "--checkpoint", str(ckpt),
+    ])
+    train_out = capsys.readouterr().out
+    assert "Training MedicalGPT" in train_out
+    assert ckpt.exists()
+
+    # 2. Complete a medical phrase via CLI
+    cli_main([
+        "complete",
+        "Myocardium", "is",
+        "--max-tokens", "16",
+        "--temperature", "0.0",
+        "--reference",
+        "--checkpoint", str(ckpt),
+    ])
+    comp_out = capsys.readouterr().out
+    assert "MedicalGPT Completion:" in comp_out
+    assert "Myocardium is" in comp_out
+    assert "Corpus Reference:" in comp_out
+
+    # 3. Lookup & inspect via CLI
+    cli_main(["lookup", "alveoli"])
+    assert "Alveoli" in capsys.readouterr().out
+
+    cli_main(["inspect", "--checkpoint", str(ckpt)])
+    inspect_out = capsys.readouterr().out
+    assert "BPE Tokenization" in inspect_out
+    assert "Trained MedicalGPT Model:" in inspect_out
+
+    # 4. Quiz (non-interactive) via CLI
+    cli_main(["quiz", "--count", "1", "--seed", "7", "--non-interactive", "--checkpoint", str(ckpt)])
+    quiz_out = capsys.readouterr().out
+    assert "Question 1/1" in quiz_out
+    assert "MedicalGPT:" in quiz_out
+
+    # 5. Direct milestone_6 helper
+    m6 = milestone_6(prompt="Alveoli are ", checkpoint_path=ckpt, max_new_tokens=12, temperature=0.0)
+    assert m6["full_text"].startswith("Alveoli are ")
+    assert m6["generated_tokens"] > 0
