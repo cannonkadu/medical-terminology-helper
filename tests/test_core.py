@@ -11,6 +11,7 @@ from app.core import (
     TrainingConfig,
     TransformerBlock,
     corpus_stats,
+    generate_completion,
     get_corpus_text,
     load_checkpoint,
     load_medical_corpus,
@@ -18,6 +19,7 @@ from app.core import (
     milestone_2,
     milestone_3,
     milestone_4,
+    milestone_5,
     search_corpus,
 )
 
@@ -111,9 +113,17 @@ def test_milestone_4(tmp_path):
 
 
 # Milestone 5: Implement a text generation function to complete medical phrases or definitions.
-@pytest.mark.skip(reason="remove this line when you start milestone 5")
 def test_milestone_5():
-    raise NotImplementedError("write the test for milestone 5")
+    result = milestone_5(
+        prompt="Myocardium is ",
+        max_new_tokens=20,
+        temperature=0.0,  # deterministic greedy decoding
+    )
+    assert result["prompt"] == "Myocardium is "
+    assert result["full_text"].startswith("Myocardium is ")
+    assert result["generated_tokens"] > 0
+    assert isinstance(result["completion"], str)
+    assert len(result["completion"].strip()) > 0
 
 
 # Milestone 6: Create a CLI for students to enter partial phrases and get completions.

@@ -730,10 +730,158 @@ def milestone_4(
     )
 
 
-# --- Milestone 5: Implement a text generation function to complete medical phrases or definitions.
-# Hint: Text Generation function.
-def milestone_5():  # TODO(milestone 5)
-    raise NotImplementedError("TODO(milestone 5)")
+# ============================================================================
+# Milestone 5: Autoregressive Text Generation for Medical Phrase Completions
+# ============================================================================
+
+@torch.no_grad()
+def generate_completion(
+    model: MedicalGPT,
+    tokenizer: BytePairTokenizer,
+    prompt: str,
+    max_new_tokens: int = 40,
+    temperature: float = 0.7,
+    top_k: int = 25,
+    top_p: float = 0.9,
+    repetition_penalty: float = 1.1,
+    stop_on_newline: bool = True,
+) -> dict:
+    """Autoregressively complete a partial medical phrase or definition."""
+    model.eval()
+    device = next(model.parameters()).device
+
+    prompt_ids = tokenizer.encode(prompt)
+    if not prompt_ids:
+        prompt_ids = [tokenizer.bos_id]
+
+    context = list(prompt_ids)
+    generated_ids: list[int] = []
+    banned_ids = {tokenizer.pad_id, tokenizer.bos_id, tokenizer.unk_id}
+
+    for _ in range(max_new_tokens):
+        window = context[-model.config.max_seq_len :]
+        x = torch.tensor([window], dtype=torch.long, device=device)
+        logits, _ = model(x)
+        next_logits = logits[0, -1, :].clone()
+
+        # Suppress non-text special tokens
+        for bad_id in banned_ids:
+            if bad_id < next_logits.size(0):
+                next_logits[bad_id] = float("-inf")
+
+        # Mild repetition penalty over recently generated tokens
+        if repetition_penalty > 1.0 and generated_ids:
+            for prev_id in set(generated_ids[-16:]):
+                if next_logits[prev_id] > 0:
+                    next_logits[prev_id] /= repetition_penalty
+                else:
+                    next_logits[prev_id] *= repetition_penalty
+
+        if temperature <= 0.0:
+            next_id = int(torch.argmax(next_logits).item())
+        else:
+            next_logits = next_logits / temperature
+
+            if top_k > 0 and top_k < next_logits.size(0):
+                top_vals, _ = torch.topk(next_logits, top_k)
+                cutoff = top_vals[-1]
+                next_logits = torch.where(
+                    next_logits < cutoff,
+                    torch.tensor(float("-inf"), device=device),
+                    next_logits,
+                )
+
+            if 0.0 < top_p < 1.0:
+                sorted_logits, sorted_indices = torch.sort(next_logits, descending=True)
+                sorted_probs = F.softmax(sorted_logits, dim=-1)
+                cum_probs = torch.cumsum(sorted_probs, dim=-1)
+                sorted_mask = cum_probs > top_p
+                sorted_mask[1:] = sorted_mask[:-1].clone()
+                sorted_mask[0] = False
+                remove_indices = sorted_indices[sorted_mask]
+                next_logits[remove_indices] = float("-inf")
+
+            probs = F.softmax(next_logits, dim=-1)
+            next_id = int(torch.multinomial(probs, num_samples=1).item())
+
+        if next_id == tokenizer.eos_id:
+            break
+
+        generated_ids.append(next_id)
+        context.append(next_id)
+
+        if stop_on_newline:
+            decoded_piece = tokenizer.decode([next_id])
+            if "\n" in decoded_piece:
+                break
+
+    completion = tokenizer.decode(generated_ids)
+    if stop_on_newline and "\n" in completion:
+        completion = completion.split("\n", 1)[0]
+
+    return {
+        "prompt": prompt,
+        "completion": completion,
+        "full_text": f"{prompt}{completion}",
+        "prompt_tokens": len(prompt_ids),
+        "generated_tokens": len(generated_ids),
+    }
+
+
+def ensure_trained_model(
+    checkpoint_path: str | Path = DEFAULT_CHECKPOINT_PATH,
+    config: TrainingConfig | None = None,
+    force_retrain: bool = False,
+    progress_callback: Callable[[dict], None] | None = None,
+) -> tuple[MedicalGPT, BytePairTokenizer, list[dict]]:
+    """Load an existing MedicalGPT checkpoint, or train one from scratch if missing."""
+    ckpt = Path(checkpoint_path)
+    if ckpt.exists() and not force_retrain:
+        return load_checkpoint(ckpt)
+    result = train_model(
+        config=config or TrainingConfig(),
+        checkpoint_path=ckpt,
+        progress_callback=progress_callback,
+    )
+    return result["model"], result["tokenizer"], result["history"]
+
+
+def milestone_5(
+    prompt: str = "Myocardium is ",
+    model: MedicalGPT | None = None,
+    tokenizer: BytePairTokenizer | None = None,
+    max_new_tokens: int = 30,
+    temperature: float = 0.7,
+    top_k: int = 20,
+    top_p: float = 0.9,
+) -> dict:
+    """Milestone 5: Generate medical phrase or definition completions from a trained GPT."""
+    if model is None or tokenizer is None:
+        cfg = TrainingConfig(
+            vocab_size=360,
+            d_model=64,
+            n_heads=4,
+            n_layers=2,
+            max_seq_len=64,
+            batch_size=16,
+            epochs=10,
+            learning_rate=5e-3,
+            stride=20,
+            device="cpu",
+        )
+        trained = train_model(config=cfg)
+        model = trained["model"]
+        tokenizer = trained["tokenizer"]
+
+    return generate_completion(
+        model=model,
+        tokenizer=tokenizer,
+        prompt=prompt,
+        max_new_tokens=max_new_tokens,
+        temperature=temperature,
+        top_k=top_k,
+        top_p=top_p,
+    )
 
 
 # --- Milestone 6: Create a CLI for students to enter partial phrases and get completions.
