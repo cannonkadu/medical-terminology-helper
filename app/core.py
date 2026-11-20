@@ -15,12 +15,16 @@ from dataclasses import asdict, dataclass
 import math
 from pathlib import Path
 import re
+import time
+from typing import Callable
 
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from torch.utils.data import DataLoader, Dataset
 
 DEFAULT_CORPUS_PATH = Path(__file__).resolve().parent.parent / "corpus" / "medical_corpus.txt"
+DEFAULT_CHECKPOINT_PATH = Path("data/medical_gpt.pt")
 
 
 # ============================================================================
@@ -492,10 +496,238 @@ def milestone_3(
     }
 
 
-# --- Milestone 4: Set up the training loop and train the GPT model on the medical text data.
-# Hint: Training Loop implementation and model training.
-def milestone_4():  # TODO(milestone 4)
-    raise NotImplementedError("TODO(milestone 4)")
+# ============================================================================
+# Milestone 4: Dataset, Training Loop, and Model Checkpointing
+# ============================================================================
+
+@dataclass
+class TrainingConfig:
+    """Configuration for training MedicalGPT from scratch on the medical corpus."""
+
+    vocab_size: int = 512
+    d_model: int = 128
+    n_heads: int = 4
+    n_layers: int = 3
+    max_seq_len: int = 96
+    dropout: float = 0.1
+    batch_size: int = 16
+    epochs: int = 25
+    learning_rate: float = 3e-3
+    weight_decay: float = 0.01
+    grad_clip: float = 1.0
+    stride: int = 16
+    seed: int = 42
+    device: str = "auto"
+
+
+class MedicalTextDataset(Dataset):
+    """Sliding-window next-token prediction dataset over tokenized medical text."""
+
+    def __init__(self, token_ids: list[int], seq_len: int, stride: int = 16):
+        self.samples: list[tuple[torch.Tensor, torch.Tensor]] = []
+        if len(token_ids) < 2:
+            raise ValueError("Need at least 2 tokens to build training pairs.")
+
+        effective_len = min(seq_len, len(token_ids) - 1)
+        step = max(1, min(stride, effective_len))
+
+        for start in range(0, len(token_ids) - effective_len, step):
+            x = torch.tensor(token_ids[start : start + effective_len], dtype=torch.long)
+            y = torch.tensor(token_ids[start + 1 : start + effective_len + 1], dtype=torch.long)
+            self.samples.append((x, y))
+
+        # Ensure the tail of the corpus is always included
+        last_start = len(token_ids) - effective_len - 1
+        if not self.samples or last_start > (len(self.samples) - 1) * step:
+            x = torch.tensor(token_ids[last_start : last_start + effective_len], dtype=torch.long)
+            y = torch.tensor(token_ids[last_start + 1 : last_start + effective_len + 1], dtype=torch.long)
+            self.samples.append((x, y))
+
+    def __len__(self) -> int:
+        return len(self.samples)
+
+    def __getitem__(self, idx: int) -> tuple[torch.Tensor, torch.Tensor]:
+        return self.samples[idx]
+
+
+def _resolve_device(device: str) -> torch.device:
+    if device == "auto":
+        return torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    return torch.device(device)
+
+
+def save_checkpoint(
+    path: str | Path,
+    model: MedicalGPT,
+    tokenizer: BytePairTokenizer,
+    history: list[dict] | None = None,
+) -> Path:
+    """Persist trained model weights, config, tokenizer merges, and training history."""
+    ckpt_path = Path(path)
+    ckpt_path.parent.mkdir(parents=True, exist_ok=True)
+    payload = {
+        "model_state_dict": model.state_dict(),
+        "config": model.config.to_dict(),
+        "tokenizer": tokenizer.to_dict(),
+        "history": history or [],
+    }
+    torch.save(payload, ckpt_path)
+    return ckpt_path
+
+
+def load_checkpoint(
+    path: str | Path,
+    device: str = "auto",
+) -> tuple[MedicalGPT, BytePairTokenizer, list[dict]]:
+    """Load a saved MedicalGPT model and its BPE tokenizer from disk."""
+    ckpt_path = Path(path)
+    if not ckpt_path.exists():
+        raise FileNotFoundError(f"Checkpoint not found at {ckpt_path}")
+    resolved = _resolve_device(device)
+    payload = torch.load(ckpt_path, map_location=resolved, weights_only=False)
+    config = GPTConfig.from_dict(payload["config"])
+    model = MedicalGPT(config).to(resolved)
+    model.load_state_dict(payload["model_state_dict"])
+    model.eval()
+    tokenizer = BytePairTokenizer.from_dict(payload["tokenizer"])
+    history = payload.get("history", [])
+    return model, tokenizer, history
+
+
+def train_model(
+    corpus_text: str | None = None,
+    config: TrainingConfig | None = None,
+    checkpoint_path: str | Path | None = None,
+    progress_callback: Callable[[dict], None] | None = None,
+) -> dict:
+    """Train MedicalGPT from scratch on the curated medical text corpus."""
+    cfg = config or TrainingConfig()
+    torch.manual_seed(cfg.seed)
+    device = _resolve_device(cfg.device)
+
+    text = corpus_text if corpus_text is not None else get_corpus_text()
+    tokenizer = BytePairTokenizer().train(text, vocab_size=cfg.vocab_size)
+    token_ids = tokenizer.encode(text)
+
+    # 90/10 train/validation split when corpus is large enough
+    split_idx = int(len(token_ids) * 0.9)
+    if len(token_ids) - split_idx > cfg.max_seq_len + 1:
+        train_ids = token_ids[:split_idx]
+        val_ids = token_ids[split_idx:]
+    else:
+        train_ids = token_ids
+        val_ids = token_ids
+
+    train_dataset = MedicalTextDataset(train_ids, seq_len=cfg.max_seq_len, stride=cfg.stride)
+    val_dataset = MedicalTextDataset(val_ids, seq_len=cfg.max_seq_len, stride=max(cfg.stride, cfg.max_seq_len // 2))
+
+    train_loader = DataLoader(train_dataset, batch_size=cfg.batch_size, shuffle=True)
+    val_loader = DataLoader(val_dataset, batch_size=cfg.batch_size, shuffle=False)
+
+    gpt_config = GPTConfig(
+        vocab_size=tokenizer.vocab_size,
+        d_model=cfg.d_model,
+        n_heads=cfg.n_heads,
+        n_layers=cfg.n_layers,
+        max_seq_len=cfg.max_seq_len,
+        dropout=cfg.dropout,
+    )
+    model = MedicalGPT(gpt_config).to(device)
+    optimizer = torch.optim.AdamW(
+        model.parameters(),
+        lr=cfg.learning_rate,
+        weight_decay=cfg.weight_decay,
+    )
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+        optimizer,
+        T_max=max(1, cfg.epochs),
+        eta_min=cfg.learning_rate * 0.1,
+    )
+
+    history: list[dict] = []
+    start_time = time.perf_counter()
+
+    for epoch in range(1, cfg.epochs + 1):
+        model.train()
+        total_train_loss = 0.0
+        batches = 0
+        for x_batch, y_batch in train_loader:
+            x_batch = x_batch.to(device)
+            y_batch = y_batch.to(device)
+
+            optimizer.zero_grad(set_to_none=True)
+            _, loss = model(x_batch, y_batch)
+            assert loss is not None
+            loss.backward()
+            torch.nn.utils.clip_grad_norm_(model.parameters(), cfg.grad_clip)
+            optimizer.step()
+
+            total_train_loss += float(loss.item())
+            batches += 1
+
+        scheduler.step()
+        avg_train_loss = total_train_loss / max(1, batches)
+
+        model.eval()
+        total_val_loss = 0.0
+        val_batches = 0
+        with torch.no_grad():
+            for x_val, y_val in val_loader:
+                x_val = x_val.to(device)
+                y_val = y_val.to(device)
+                _, v_loss = model(x_val, y_val)
+                assert v_loss is not None
+                total_val_loss += float(v_loss.item())
+                val_batches += 1
+
+        avg_val_loss = total_val_loss / max(1, val_batches)
+        perplexity = math.exp(min(avg_val_loss, 20.0))
+
+        record = {
+            "epoch": epoch,
+            "train_loss": round(avg_train_loss, 4),
+            "val_loss": round(avg_val_loss, 4),
+            "perplexity": round(perplexity, 2),
+        }
+        history.append(record)
+        if progress_callback is not None:
+            progress_callback(record)
+
+    elapsed = round(time.perf_counter() - start_time, 2)
+    model.eval()
+
+    saved_path = None
+    if checkpoint_path is not None:
+        saved_path = str(save_checkpoint(checkpoint_path, model, tokenizer, history))
+
+    return {
+        "model": model,
+        "tokenizer": tokenizer,
+        "config": gpt_config,
+        "history": history,
+        "initial_loss": history[0]["train_loss"],
+        "final_loss": history[-1]["train_loss"],
+        "final_val_loss": history[-1]["val_loss"],
+        "final_perplexity": history[-1]["perplexity"],
+        "num_tokens": len(token_ids),
+        "num_samples": len(train_dataset),
+        "num_parameters": model.num_parameters(),
+        "elapsed_seconds": elapsed,
+        "checkpoint_path": saved_path,
+    }
+
+
+def milestone_4(
+    corpus_text: str | None = None,
+    config: TrainingConfig | None = None,
+    checkpoint_path: str | Path | None = None,
+) -> dict:
+    """Milestone 4: Train MedicalGPT on the medical text corpus and verify loss decreases."""
+    return train_model(
+        corpus_text=corpus_text,
+        config=config,
+        checkpoint_path=checkpoint_path,
+    )
 
 
 # --- Milestone 5: Implement a text generation function to complete medical phrases or definitions.

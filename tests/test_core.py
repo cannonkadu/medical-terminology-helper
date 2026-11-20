@@ -8,13 +8,16 @@ from app.core import (
     GPTConfig,
     MedicalEmbedding,
     MedicalGPT,
+    TrainingConfig,
     TransformerBlock,
     corpus_stats,
     get_corpus_text,
+    load_checkpoint,
     load_medical_corpus,
     milestone_1,
     milestone_2,
     milestone_3,
+    milestone_4,
     search_corpus,
 )
 
@@ -80,9 +83,31 @@ def test_milestone_3():
 
 
 # Milestone 4: Set up the training loop and train the GPT model on the medical text data.
-@pytest.mark.skip(reason="remove this line when you start milestone 4")
-def test_milestone_4():
-    raise NotImplementedError("write the test for milestone 4")
+def test_milestone_4(tmp_path):
+    ckpt = tmp_path / "medical_gpt.pt"
+    cfg = TrainingConfig(
+        vocab_size=340,
+        d_model=48,
+        n_heads=4,
+        n_layers=2,
+        max_seq_len=48,
+        batch_size=16,
+        epochs=6,
+        learning_rate=5e-3,
+        stride=24,
+        device="cpu",
+    )
+    result = milestone_4(config=cfg, checkpoint_path=ckpt)
+
+    assert len(result["history"]) == 6
+    assert result["final_loss"] < result["initial_loss"]
+    assert ckpt.exists()
+
+    # Verify checkpoint round-trip loading
+    loaded_model, loaded_tok, loaded_history = load_checkpoint(ckpt, device="cpu")
+    assert loaded_model.config.d_model == 48
+    assert loaded_tok.vocab_size == result["tokenizer"].vocab_size
+    assert len(loaded_history) == 6
 
 
 # Milestone 5: Implement a text generation function to complete medical phrases or definitions.
