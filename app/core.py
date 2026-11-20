@@ -11,6 +11,8 @@ Built milestone by milestone:
 from __future__ import annotations
 
 from collections import Counter
+from dataclasses import asdict, dataclass
+import math
 from pathlib import Path
 import re
 
@@ -303,10 +305,191 @@ def milestone_2(
     }
 
 
-# --- Milestone 3: Build the causal self-attention mechanism and assemble the transformer block.
-# Hint: Causal Self-Attention and Transformer Block assembly.
-def milestone_3():  # TODO(milestone 3)
-    raise NotImplementedError("TODO(milestone 3)")
+# ============================================================================
+# Milestone 3: Causal Self-Attention, Transformer Block, and MedicalGPT
+# ============================================================================
+
+@dataclass
+class GPTConfig:
+    """Hyperparameters for the from-scratch MedicalGPT model."""
+
+    vocab_size: int = 512
+    d_model: int = 128
+    n_heads: int = 4
+    n_layers: int = 3
+    max_seq_len: int = 128
+    dropout: float = 0.1
+
+    def to_dict(self) -> dict:
+        return asdict(self)
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "GPTConfig":
+        return cls(**data)
+
+
+class CausalSelfAttention(nn.Module):
+    """Multi-head causal self-attention with upper-triangular future masking."""
+
+    def __init__(self, d_model: int, n_heads: int, max_seq_len: int = 128, dropout: float = 0.1):
+        super().__init__()
+        if d_model % n_heads != 0:
+            raise ValueError(f"d_model ({d_model}) must be divisible by n_heads ({n_heads})")
+        self.d_model = d_model
+        self.n_heads = n_heads
+        self.head_dim = d_model // n_heads
+
+        self.qkv_proj = nn.Linear(d_model, 3 * d_model)
+        self.out_proj = nn.Linear(d_model, d_model)
+        self.attn_dropout = nn.Dropout(dropout)
+        self.resid_dropout = nn.Dropout(dropout)
+
+        causal_mask = torch.tril(torch.ones(max_seq_len, max_seq_len, dtype=torch.bool))
+        self.register_buffer("causal_mask", causal_mask.view(1, 1, max_seq_len, max_seq_len))
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        batch_size, seq_len, d_model = x.shape
+        qkv = self.qkv_proj(x)
+        q, k, v = qkv.split(d_model, dim=-1)
+
+        q = q.view(batch_size, seq_len, self.n_heads, self.head_dim).transpose(1, 2)
+        k = k.view(batch_size, seq_len, self.n_heads, self.head_dim).transpose(1, 2)
+        v = v.view(batch_size, seq_len, self.n_heads, self.head_dim).transpose(1, 2)
+
+        scale = 1.0 / math.sqrt(self.head_dim)
+        scores = (q @ k.transpose(-2, -1)) * scale
+        mask = self.causal_mask[:, :, :seq_len, :seq_len]
+        scores = scores.masked_fill(~mask, float("-inf"))
+
+        attn_weights = F.softmax(scores, dim=-1)
+        attn_weights = self.attn_dropout(attn_weights)
+
+        out = attn_weights @ v
+        out = out.transpose(1, 2).contiguous().view(batch_size, seq_len, d_model)
+        return self.resid_dropout(self.out_proj(out))
+
+
+class FeedForward(nn.Module):
+    """Position-wise feed-forward network with GELU activation."""
+
+    def __init__(self, d_model: int, dropout: float = 0.1):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(d_model, 4 * d_model),
+            nn.GELU(),
+            nn.Linear(4 * d_model, d_model),
+            nn.Dropout(dropout),
+        )
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return self.net(x)
+
+
+class TransformerBlock(nn.Module):
+    """Pre-LayerNorm decoder Transformer block with causal self-attention and MLP."""
+
+    def __init__(self, d_model: int, n_heads: int, max_seq_len: int = 128, dropout: float = 0.1):
+        super().__init__()
+        self.ln1 = nn.LayerNorm(d_model)
+        self.attn = CausalSelfAttention(d_model, n_heads, max_seq_len=max_seq_len, dropout=dropout)
+        self.ln2 = nn.LayerNorm(d_model)
+        self.ffn = FeedForward(d_model, dropout=dropout)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        x = x + self.attn(self.ln1(x))
+        x = x + self.ffn(self.ln2(x))
+        return x
+
+
+class MedicalGPT(nn.Module):
+    """Decoder-only GPT language model built from scratch in PyTorch."""
+
+    def __init__(self, config: GPTConfig):
+        super().__init__()
+        self.config = config
+        self.embedding = MedicalEmbedding(
+            vocab_size=config.vocab_size,
+            d_model=config.d_model,
+            max_seq_len=config.max_seq_len,
+            dropout=config.dropout,
+        )
+        self.blocks = nn.ModuleList([
+            TransformerBlock(
+                d_model=config.d_model,
+                n_heads=config.n_heads,
+                max_seq_len=config.max_seq_len,
+                dropout=config.dropout,
+            )
+            for _ in range(config.n_layers)
+        ])
+        self.ln_f = nn.LayerNorm(config.d_model)
+        self.lm_head = nn.Linear(config.d_model, config.vocab_size, bias=False)
+
+        self.apply(self._init_weights)
+        # Weight tying between token embedding and output projection
+        self.lm_head.weight = self.embedding.token_embedding.weight
+
+    @staticmethod
+    def _init_weights(module: nn.Module) -> None:
+        if isinstance(module, nn.Linear):
+            nn.init.normal_(module.weight, mean=0.0, std=0.02)
+            if module.bias is not None:
+                nn.init.zeros_(module.bias)
+        elif isinstance(module, nn.Embedding):
+            nn.init.normal_(module.weight, mean=0.0, std=0.02)
+        elif isinstance(module, nn.LayerNorm):
+            nn.init.ones_(module.weight)
+            nn.init.zeros_(module.bias)
+
+    def forward(
+        self,
+        token_ids: torch.Tensor,
+        targets: torch.Tensor | None = None,
+    ) -> tuple[torch.Tensor, torch.Tensor | None]:
+        x = self.embedding(token_ids)
+        for block in self.blocks:
+            x = block(x)
+        x = self.ln_f(x)
+        logits = self.lm_head(x)
+
+        loss = None
+        if targets is not None:
+            loss = F.cross_entropy(logits.view(-1, logits.size(-1)), targets.view(-1))
+        return logits, loss
+
+    def num_parameters(self) -> int:
+        return sum(p.numel() for p in self.parameters())
+
+
+def milestone_3(
+    vocab_size: int = 400,
+    d_model: int = 64,
+    n_heads: int = 4,
+    n_layers: int = 2,
+    max_seq_len: int = 64,
+) -> dict:
+    """Milestone 3: Build causal self-attention, transformer block, and full MedicalGPT."""
+    config = GPTConfig(
+        vocab_size=vocab_size,
+        d_model=d_model,
+        n_heads=n_heads,
+        n_layers=n_layers,
+        max_seq_len=max_seq_len,
+        dropout=0.0,
+    )
+    model = MedicalGPT(config)
+    model.eval()
+    sample_ids = torch.randint(0, vocab_size, (2, 12))
+    with torch.no_grad():
+        logits, _ = model(sample_ids)
+    return {
+        "config": config,
+        "model": model,
+        "block": model.blocks[0],
+        "attention": model.blocks[0].attn,
+        "sample_logits": logits,
+        "num_parameters": model.num_parameters(),
+    }
 
 
 # --- Milestone 4: Set up the training loop and train the GPT model on the medical text data.
