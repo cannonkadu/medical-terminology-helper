@@ -1,13 +1,22 @@
-"""Your tests. Each milestone in README.md gets one here: write the test first, then make it pass.
-
-They start skipped. Remove the `skip` line as you work on each milestone.
-"""
+"""Tests for Medical Terminology Helper milestones."""
 import pytest
 
+from app.core import corpus_stats, get_corpus_text, load_medical_corpus, milestone_1, search_corpus
+
+
 # Milestone 1: Curate a small corpus of public domain medical texts (e.g., anatomy, physiology).
-@pytest.mark.skip(reason="remove this line when you start milestone 1")
 def test_milestone_1():
-    raise NotImplementedError("write the test for milestone 1")
+    result = milestone_1()
+    assert len(result["entries"]) >= 100
+    assert result["stats"]["num_categories"] >= 8
+    assert result["stats"]["num_words"] >= 1500
+    assert "Myocardium" in result["text"]
+    assert "Alveoli" in result["text"]
+    assert "Neuron" in result["text"]
+
+    matches = search_corpus("myocardium")
+    assert len(matches) >= 1
+    assert matches[0]["term"].lower() == "myocardium"
 
 
 # Milestone 2: Implement the byte-pair tokenizer and generate embeddings from the medical corpus.

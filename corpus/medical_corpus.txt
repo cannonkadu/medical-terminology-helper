@@ -1,0 +1,210 @@
+# Public Domain Medical Terminology, Anatomy, Physiology, and Pathology Corpus
+# Curated for Medical Terminology Helper (Build GPT from Scratch)
+
+## Cardiovascular System and Hematology
+Myocardium is the thick muscular middle layer of the heart wall responsible for contracting and pumping blood throughout the body.
+Pericardium is the double-walled fibroserous sac that surrounds and protects the heart and the roots of the great vessels.
+Endocardium is the smooth inner endothelial lining of the heart chambers and valves that minimizes friction as blood flows.
+Systole is the contraction phase of the cardiac cycle during which the ventricles eject blood into the aorta and pulmonary artery.
+Diastole is the relaxation phase of the cardiac cycle during which the heart chambers fill with venous blood.
+Cardiac output is the volume of blood pumped by each ventricle per minute, calculated as heart rate multiplied by stroke volume.
+Stroke volume is the amount of blood ejected by the left ventricle during a single systolic contraction.
+Sinoatrial node is the natural pacemaker of the heart located in the right atrium that initiates electrical impulses.
+Atrioventricular node is the electrical relay station between the atria and ventricles that briefly delays conduction to allow ventricular filling.
+Bradycardia is an abnormally slow resting heart rate typically defined as fewer than sixty beats per minute in adults.
+Tachycardia is an abnormally rapid resting heart rate typically exceeding one hundred beats per minute in adults.
+Arrhythmia is an irregular or abnormal heart rhythm caused by disturbances in electrical impulse generation or conduction.
+Atherosclerosis is the chronic progressive buildup of lipid plaques, fibrous tissue, and calcium within arterial walls.
+Ischemia is an inadequate blood supply to an organ or tissue resulting in a shortage of oxygen and nutrients needed for cellular metabolism.
+Myocardial infarction is the irreversible necrosis of heart muscle tissue caused by prolonged obstruction of a coronary artery.
+Hypertension is persistently elevated systemic arterial blood pressure that increases workload on the heart and vascular walls.
+Hypotension is abnormally low arterial blood pressure that can lead to inadequate perfusion of vital organs.
+Aneurysm is a localized abnormal dilation or ballooning of a blood vessel wall caused by structural weakness.
+Thrombosis is the formation of a blood clot inside a blood vessel that obstructs normal blood flow.
+Embolism is the sudden obstruction of a blood vessel by a traveling clot, air bubble, fat globule, or foreign material.
+Aorta is the largest elastic artery in the human body, originating from the left ventricle to distribute oxygenated blood systemically.
+Vena cava refers to the superior and inferior large veins that return deoxygenated venous blood from the body to the right atrium.
+Capillary is the smallest blood vessel with thin single-cell walls enabling exchange of oxygen, carbon dioxide, nutrients, and waste.
+Hemoglobin is the iron-containing metalloprotein in red blood cells that reversibly binds and transports oxygen from the lungs to tissues.
+Erythrocyte is a biconcave anucleate red blood cell specialized for oxygen transport via hemoglobin.
+Leukocyte is a nucleated white blood cell of the immune system that defends the body against infection and foreign substances.
+Thrombocyte is a small cytoplasmic fragment also called a platelet that initiates hemostasis and blood clot formation.
+Anemia is a clinical condition characterized by reduced red blood cell mass or hemoglobin concentration leading to decreased oxygen delivery.
+Hemostasis is the physiological process that stops bleeding through vasoconstriction, platelet plug formation, and coagulation.
+
+## Respiratory System
+Alveoli are tiny thin-walled air sacs at the distal ends of bronchioles where pulmonary gas exchange occurs across the respiratory membrane.
+Trachea is the cartilaginous windpipe that conducts inspired air from the larynx down to the primary bronchi.
+Bronchus is a major conducting airway branching from the trachea into the left and right lungs.
+Bronchiole is a small airway branch lacking cartilage whose smooth muscle regulates airflow resistance to the alveoli.
+Larynx is the cartilaginous voice box situated between the pharynx and trachea that houses the vocal cords and protects the lower airway.
+Pharynx is the muscular throat passage shared by both the respiratory and digestive tracts behind the nasal and oral cavities.
+Diaphragm is the dome-shaped skeletal muscle separating the thoracic and abdominal cavities that serves as the primary muscle of inspiration.
+Pleura is the double-layered serous membrane enclosing each lung and lining the thoracic cavity to reduce friction during breathing.
+Surfactant is a phospholipid lipoprotein mixture secreted by type two alveolar cells that lowers surface tension and prevents alveolar collapse.
+Dyspnea is the subjective clinical sensation of difficult, labored, or uncomfortable breathing.
+Hypoxia is a state of insufficient oxygen availability at the cellular or tissue level to maintain normal aerobic metabolism.
+Hypoxemia is an abnormally low partial pressure or concentration of oxygen dissolved in arterial blood.
+Hypercapnia is an abnormally elevated level of carbon dioxide in the arterial blood resulting from inadequate alveolar ventilation.
+Pneumothorax is the presence of air in the pleural cavity causing partial or complete collapse of the affected lung.
+Pulmonary edema is the abnormal accumulation of extravascular fluid in the interstitial spaces and alveoli of the lungs.
+Tachypnea is abnormally rapid and shallow breathing exceeding the normal respiratory rate.
+Bradypnea is abnormally slow breathing below the normal physiological respiratory rate.
+Apnea is the temporary cessation of spontaneous breathing lasting several seconds or longer.
+Cyanosis is a bluish discoloration of the skin and mucous membranes caused by elevated levels of deoxygenated hemoglobin.
+Spirometry is a pulmonary function test measuring the volume and flow rate of air inhaled and exhaled by the lungs.
+
+## Nervous System
+Neuron is the fundamental excitable cell of the nervous system that receives, integrates, and transmits electrochemical signals.
+Synapse is the specialized junction where an electrical or chemical signal passes from one neuron to another target cell.
+Axon is the long slender nerve fiber projecting from a neuron cell body that conducts action potentials away toward synaptic terminals.
+Dendrite is a branched cytoplasmic extension of a neuron that receives incoming synaptic signals from adjacent neurons.
+Myelin sheath is the insulating lipid-rich layer wrapped around axons by Schwann cells or oligodendrocytes to accelerate nerve conduction.
+Action potential is a rapid transient reversal of membrane electrical potential that propagates along an excitable axon.
+Neurotransmitter is a chemical messenger released from presynaptic vesicles across the synaptic cleft to bind postsynaptic receptors.
+Cerebrum is the largest division of the brain divided into two hemispheres governing conscious thought, perception, language, and voluntary movement.
+Cerebellum is the posterior brain structure coordinating fine motor control, posture, equilibrium, and motor learning.
+Brainstem consists of the midbrain, pons, and medulla oblongata and regulates vital autonomic functions including respiration and heart rate.
+Medulla oblongata is the lowest part of the brainstem containing reflex centers for breathing, blood pressure, and swallowing.
+Hypothalamus is the diencephalic control center linking the nervous and endocrine systems to regulate temperature, hunger, thirst, and circadian rhythms.
+Hippocampus is a curved limbic structure within the medial temporal lobe essential for consolidating short-term memory into long-term memory.
+Amygdala is an almond-shaped limbic nucleus involved in processing emotion, fear conditioning, and threat detection.
+Meninges are the three protective connective tissue membranes named dura mater, arachnoid mater, and pia mater covering the brain and spinal cord.
+Cerebrospinal fluid is the clear colorless liquid circulating through the ventricles and subarachnoid space to cushion and nourish the central nervous system.
+Aphasia is an acquired impairment of language comprehension or expression resulting from damage to cerebral language centers.
+Neuropathy is dysfunction or pathological damage affecting one or more peripheral nerves causing numbness, tingling, or muscle weakness.
+Meningitis is inflammation of the meningeal membranes surrounding the brain and spinal cord, commonly caused by bacterial or viral infection.
+Encephalitis is acute inflammation of the brain parenchyma typically resulting from a viral infection or autoimmune response.
+Stroke is an acute focal neurological deficit caused by interrupted cerebral blood flow from ischemia or intracranial hemorrhage.
+Seizure is a sudden transient episode of abnormal excessive synchronous neuronal electrical activity in the cerebral cortex.
+
+## Musculoskeletal System
+Osteoblast is a bone-forming cell responsible for synthesizing and secreting organic bone matrix called osteoid.
+Osteoclast is a large multinucleated cell that resorbs mineralized bone tissue during growth, remodeling, and calcium homeostasis.
+Osteocyte is a mature bone cell embedded within mineralized lacunae that senses mechanical stress and maintains bone matrix.
+Periosteum is the dense vascular fibrous membrane covering the outer surface of bones except at articular cartilage.
+Cartilage is a flexible avascular connective tissue composed of chondrocytes in an extracellular matrix that cushions joints and shapes structures.
+Tendon is a tough band of dense regular fibrous connective tissue attaching skeletal muscle to bone to transmit contractile force.
+Ligament is a fibrous band of connective tissue connecting bone to bone across a joint to provide mechanical stability.
+Sarcomere is the basic functional contractile unit of striated muscle extending between two adjacent Z discs.
+Actin and myosin are the thin and thick contractile protein filaments that slide past one another during skeletal muscle contraction.
+Atrophy is the decrease in size or wasting of a tissue, organ, or muscle due to disuse, denervation, or nutritional deficiency.
+Hypertrophy is the enlargement of an organ or tissue resulting from an increase in the size of its individual constituent cells.
+Osteoporosis is a systemic skeletal disorder characterized by reduced bone mineral density and microarchitectural deterioration increasing fracture risk.
+Osteoarthritis is a degenerative joint disease marked by progressive breakdown of articular cartilage and subchondral bone remodeling.
+Scoliosis is an abnormal lateral curvature and rotational deformity of the vertebral column.
+Synovial joint is a freely movable diarthrodial joint enclosed by a capsule lined with synovial membrane secreting lubricating fluid.
+
+## Endocrine and Metabolic Systems
+Homeostasis is the dynamic physiological maintenance of a stable internal environment despite fluctuations in external conditions.
+Hormone is a chemical signaling molecule secreted by an endocrine gland directly into the bloodstream to regulate distant target organs.
+Pituitary gland is the master endocrine gland at the base of the brain composed of anterior and posterior lobes regulating multiple hormonal axes.
+Thyroid gland is a butterfly-shaped endocrine gland in the anterior neck producing thyroxine and triiodothyronine to regulate basal metabolic rate.
+Parathyroid glands are four small endocrine glands posterior to the thyroid that secrete parathyroid hormone to elevate serum calcium levels.
+Adrenal cortex is the outer layer of the adrenal gland synthesizing steroid hormones including cortisol, aldosterone, and androgens.
+Pancreas is a mixed exocrine and endocrine organ whose islets of Langerhans secrete insulin and glucagon to regulate blood glucose.
+Insulin is a peptide hormone secreted by pancreatic beta cells that lowers blood glucose by promoting cellular uptake and glycogen synthesis.
+Glucagon is a peptide hormone secreted by pancreatic alpha cells that raises blood glucose by stimulating hepatic glycogenolysis and gluconeogenesis.
+Hyperglycemia is an abnormally elevated concentration of glucose circulating in the bloodstream, characteristic of uncontrolled diabetes mellitus.
+Hypoglycemia is an abnormally low concentration of blood glucose that can impair neurological function and cause diaphoresis or confusion.
+Cortisol is the primary glucocorticoid stress hormone secreted by the adrenal cortex that increases gluconeogenesis and modulates inflammation.
+Epinephrine is a catecholamine hormone and neurotransmitter released by the adrenal medulla during sympathetic fight-or-flight activation.
+Negative feedback is the primary regulatory mechanism in endocrinology whereby rising hormone levels inhibit further hormone secretion.
+Metabolism is the sum of all catabolic and anabolic biochemical reactions sustaining cellular energy production and biosynthesis.
+
+## Renal and Urinary System
+Nephron is the structural and functional filtration unit of the kidney consisting of a renal corpuscle and a renal tubule.
+Glomerulus is a specialized tuft of fenestrated capillaries inside Bowman capsule where blood plasma is ultrafiltered under hydrostatic pressure.
+Renal tubule is the segmented epithelial channel comprising the proximal convoluted tubule, loop of Henle, and distal convoluted tubule.
+Glomerular filtration rate is the total volume of fluid filtered from the renal glomerular capillaries into Bowman capsule per unit time.
+Reabsorption is the tubular transport process reclaiming water, glucose, amino acids, and electrolytes from filtrate back into peritubular capillaries.
+Secretion is the active transport of waste products, hydrogen ions, and drugs from peritubular blood into the renal tubular lumen.
+Urea is the primary nitrogenous waste product formed in the liver from protein catabolism and excreted by the kidneys in urine.
+Creatinine is a breakdown product of muscle creatine phosphate filtered freely by the glomerulus and used to estimate renal function.
+Diuresis is the increased production and excretion of urine by the kidneys.
+Oliguria is abnormally diminished urine output, typically defined as less than four hundred milliliters per day in adults.
+Anuria is the complete or near-complete absence of urine production indicating severe renal failure or urinary tract obstruction.
+Hematuria is the abnormal presence of intact red blood cells in the urine, which may be microscopic or grossly visible.
+Proteinuria is the presence of excessive amounts of serum protein, especially albumin, in the urine indicating glomerular injury.
+Acidosis is a pathological process causing an abnormally low blood pH below seven point three five due to excess acid or base loss.
+Alkalosis is a pathological process causing an abnormally high blood pH above seven point four five due to excess base or acid loss.
+
+## Gastrointestinal and Hepatic Systems
+Peristalsis is the coordinated wave-like contraction of smooth muscle that propels food and fluid along the gastrointestinal tract.
+Esophagus is the muscular tube conveying swallowed food and liquid from the pharynx to the stomach through the diaphragm.
+Duodenum is the first C-shaped segment of the small intestine where gastric chyme mixes with bile and pancreatic digestive enzymes.
+Villi are microscopic finger-like projections of the small intestinal mucosa that vastly expand surface area for nutrient absorption.
+Hepatocyte is the primary parenchymal epithelial cell of the liver performing detoxification, protein synthesis, and bile production.
+Bile is a greenish-yellow alkaline fluid synthesized by hepatocytes and stored in the gallbladder to emulsify dietary fats.
+Bilirubin is a yellow tetrapyrrole pigment produced from the normal breakdown of heme from senescent red blood cells.
+Jaundice is the yellowish discoloration of the sclera, skin, and mucous membranes resulting from elevated serum bilirubin levels.
+Cirrhosis is advanced irreversible scarring and nodular regeneration of liver parenchyma that impairs hepatic function and portal blood flow.
+Hepatitis is inflammation of the liver parenchyma caused by hepatotropic viruses, toxins, alcohol, or autoimmune mechanisms.
+Gastritis is inflammation of the gastric mucosal lining often associated with Helicobacter pylori infection or nonsteroidal anti-inflammatory drugs.
+Dysphagia is clinical difficulty or discomfort during the act of swallowing solids or liquids.
+Ascites is the pathological accumulation of free serous fluid within the peritoneal cavity, frequently secondary to portal hypertension.
+
+## Immunology, Pathology, and Microbiology
+Antigen is any foreign or self molecular structure capable of being recognized by antibodies or lymphocyte receptors to provoke an immune response.
+Antibody is a Y-shaped immunoglobulin glycoprotein secreted by plasma cells that specifically binds and neutralizes target antigens.
+Lymphocyte is a mononuclear white blood cell encompassing B cells, T cells, and natural killer cells essential for adaptive immunity.
+Macrophage is a large phagocytic tissue leukocyte derived from circulating monocytes that engulfs pathogens and presents antigens.
+Neutrophil is the most abundant circulating granulocyte that rapidly migrates to sites of acute bacterial infection to perform phagocytosis.
+Cytokine is a small secreted signaling protein mediating communication between immune cells during inflammation and host defense.
+Inflammation is the protective vascular and cellular tissue response to injury or infection characterized by redness, heat, swelling, and pain.
+Phagocytosis is the cellular process by which specialized leukocytes engulf and digest microorganisms, cellular debris, and foreign particles.
+Anaphylaxis is a severe rapid-onset systemic allergic reaction causing bronchospasm, vasodilation, urticaria, and potentially fatal shock.
+Autoimmunity is a breakdown of self-tolerance in which the immune system erroneously attacks the body's own healthy cells and tissues.
+Sepsis is life-threatening organ dysfunction caused by a dysregulated systemic host immune response to infection.
+Necrosis is uncontrolled pathological cell death caused by severe injury, ischemia, or toxins that triggers local tissue inflammation.
+Apoptosis is genetically programmed orderly cell death that eliminates damaged or unneeded cells without provoking inflammation.
+Edema is the abnormal accumulation of interstitial fluid within body tissues causing visible or palpable swelling.
+Erythema is superficial reddening of the skin or mucous membranes caused by dilation and congestion of dermal capillaries.
+
+## Clinical Medicine, Pharmacology, and Diagnostic Terms
+Diagnosis is the systematic identification of the nature and cause of a disease through clinical history, physical examination, and diagnostic testing.
+Prognosis is the medical forecast of the likely course, duration, and expected outcome of a patient's disease.
+Etiology is the underlying cause or set of causal factors responsible for the origin of a medical disorder.
+Pathogenesis is the stepwise biological mechanism by which an etiological agent produces structural and functional disease changes.
+Prophylaxis is a preventive medical intervention, medication, or measure taken to guard against the development of disease.
+Palliative care is specialized medical care focused on relieving symptoms, pain, and stress of serious illness to improve quality of life.
+Acute describes a disease or symptom with rapid onset, severe intensity, and relatively short clinical duration.
+Chronic describes a medical condition that develops gradually and persists over a prolonged period of months or years.
+Benign refers to a non-cancerous neoplasm that grows locally without invading adjacent tissues or spreading to distant sites.
+Malignant refers to a cancerous neoplasm capable of local tissue invasion and distant spread through blood or lymphatic vessels.
+Metastasis is the spread of malignant tumor cells from a primary anatomical site to secondary distant organs.
+Biopsy is the surgical or needle removal of a small sample of living tissue for microscopic histological examination.
+Auscultation is the clinical examination technique of listening to internal body sounds of the heart, lungs, and abdomen using a stethoscope.
+Palpation is the physical examination method of using the hands and fingers to assess tissue texture, tenderness, masses, and organ borders.
+Percussion is the diagnostic technique of tapping the body surface to evaluate the density and resonance of underlying organs.
+Idiopathic describes a medical condition or disease arising spontaneously from an unknown or obscure primary cause.
+Iatrogenic describes an unintended adverse condition or complication induced inadvertently by medical treatment or diagnostic procedure.
+Nosocomial refers to a hospital-acquired infection that develops during medical care and was not present at the time of admission.
+Contraindication is a specific clinical factor or condition that renders a particular drug or procedure inadvisable or unsafe.
+Pharmacokinetics is the study of how the body absorbs, distributes, metabolizes, and excretes a drug over time.
+Pharmacodynamics is the study of the biochemical and physiological effects of drugs and their mechanisms of action on target receptors.
+Bioavailability is the fraction of an administered dose of unchanged drug that reaches the systemic arterial circulation.
+Half-life is the time required for the plasma concentration of a drug in the body to decrease by fifty percent.
+Therapeutic index is the quantitative ratio between the toxic dose and the effective therapeutic dose indicating a drug's margin of safety.
+
+## Medical Prefixes, Suffixes, and Word Roots
+The prefix brady means slow, as seen in bradycardia for slow heart rate and bradypnea for slow breathing.
+The prefix tachy means fast or rapid, as seen in tachycardia for rapid heart rate and tachypnea for rapid breathing.
+The prefix hyper means excessive or above normal, as seen in hypertension and hyperglycemia.
+The prefix hypo means deficient or below normal, as seen in hypotension, hypoxia, and hypoglycemia.
+The prefix dys means difficult, painful, or abnormal, as seen in dyspnea for labored breathing and dysphagia for difficulty swallowing.
+The prefix poly means many or excessive, as seen in polyuria for excessive urination and polydipsia for excessive thirst.
+The prefix oligo means scanty or few, as seen in oliguria for diminished urine output.
+The suffix itis denotes inflammation, as seen in gastritis, hepatitis, meningitis, and pericarditis.
+The suffix ectomy denotes surgical excision or removal, as seen in appendectomy and thyroidectomy.
+The suffix otomy denotes a surgical incision into an organ or tissue, as seen in tracheotomy and craniotomy.
+The suffix ostomy denotes creating a permanent or temporary surgical opening, as seen in colostomy and tracheostomy.
+The suffix pathy denotes a disease process or disorder, as seen in neuropathy, cardiomyopathy, and nephropathy.
+The suffix megaly denotes abnormal enlargement of an organ, as seen in hepatomegaly and cardiomegaly.
+The suffix penia denotes a deficiency or reduction in cellular count, as seen in leukopenia and thrombocytopenia.
+The suffix scopy denotes visual endoscopic examination of an internal cavity, as seen in bronchoscopy and colonoscopy.
+The suffix algia denotes localized pain, as seen in myalgia for muscle pain and neuralgia for nerve pain.
+The suffix stenosis denotes abnormal narrowing of a bodily passage, valve, or blood vessel, as seen in aortic stenosis.
+The suffix sclerosis denotes abnormal hardening or stiffening of tissue, as seen in atherosclerosis and arteriosclerosis.
+The root cardio refers to the heart, neuro refers to nerves, hepato refers to the liver, and nephro refers to the kidney.
+The root pulmo refers to the lungs, hemo refers to blood, osteo refers to bone, myo refers to muscle, and gastro refers to the stomach.
